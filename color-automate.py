@@ -74,6 +74,7 @@ for i in range (1,len(project_status)):
 	print project_per_complete[i].value > 1
 	print type(project_per_complete[i].value)
 
+
 	# R8C1
 	if project_start_date[i].value == None and project_status[i].value != "Booked":
 		project_start_date[i].fill = redFill
@@ -85,12 +86,12 @@ for i in range (1,len(project_status)):
 		project_status[i].fill = redFill
 
 	# R9C4
-	if project_end_date[i].value < project_start_date[i].value:
+	if (project_end_date[i].value != None and project_start_date[i].value != None) and project_end_date[i].value < project_start_date[i].value:
 		project_end_date[i].fill = redFill
 		project_start_date[i].fill = redFill
 
 	# R9C2
-	if (project_end_date[i].value < datetime.now().date() and (project_status[i].value != "Complete" or (project_status[i].value.find("Complete") != -1 and project_status[i].value.find("-") != -1) or project_status[i].value != "Closed")):
+	if (project_end_date[i].value != None) and (project_end_date[i].value < datetime.now().date() and (project_status[i].value != "Complete" or (project_status[i].value.find("Complete") != -1 and project_status[i].value.find("-") != -1) or project_status[i].value != "Closed")):
 		project_end_date[i].fill = redFill
 		project_status[i].fill = redFill
 
@@ -101,6 +102,11 @@ for i in range (1,len(project_status)):
 
 
 	#R10C1
+	if (last_updated[i].value == None and project_status[i].value != "Booked"):
+		last_updated[i].fill = redFill
+		project_status[i].fill = "Booked"
+
+	
 
 
 
