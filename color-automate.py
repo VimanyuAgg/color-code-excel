@@ -63,85 +63,152 @@ wineFill =  PatternFill(start_color='722f37',
                    end_color='722f37',
                    fill_type='solid')
 
-project_status = ws['E']
-project_stage = ws['D']
-project_per_complete = ws['L']
-project_start_date =ws['H']
-project_end_date = ws['I']
-last_updated  = ws['k']
+project_status = ws['F']
+project_stage = ws['E']
+project_per_complete = ws['N']
+project_start_date =ws['J']
+project_end_date = ws['K']
+last_updated  = ws['M']
+rag_status = ws['G']
+rag_reason = ws['H']
+margin_variance = ws['O']
+delivery_days_variance = ws['P']
+reason_overrun = ws['Q']
+delivery_country = ws['T']
+project_type= ws['AB']
+# to_expiry_date = ws['J']
+project_category = ws['AD']
+project_revenue = ws['AE']
+revenue_source = ws['Z']
+amount_invoiced = ws['AF']
+
 
 for i in range (1,len(project_status)):
 	print project_per_complete[i].value > 1
 	print type(project_per_complete[i].value)
 
 
-	# R8C1
+	# R9C1
 	if project_start_date[i].value == None and project_status[i].value != "Booked":
 		project_start_date[i].fill = redFill
 		project_status[i].fill = redFill
 
-	# R9C1
+	# R10C1
 	if project_end_date[i].value == None and project_status[i].value != "Booked":
 		project_end_date[i].fill = redFill
 		project_status[i].fill = redFill
 
-	# R9C4
+	# R10C4
 	if (project_end_date[i].value != None and project_start_date[i].value != None) and project_end_date[i].value < project_start_date[i].value:
 		project_end_date[i].fill = redFill
 		project_start_date[i].fill = redFill
 
-	# R9C2
+	# R10C2
 	if (project_end_date[i].value != None) and (project_end_date[i].value < datetime.now().date() and (project_status[i].value != "Complete" or (project_status[i].value.find("Complete") != -1 and project_status[i].value.find("-") != -1) or project_status[i].value != "Closed")):
 		project_end_date[i].fill = redFill
 		project_status[i].fill = redFill
 
-	# R9C3
+	# R10C3
 	if (project_end_date[i].value > datetime.now().date() and (project_status[i].value == "Complete" or project_status[i].value == "Closed" or (project_status[i].value.find("Complete") != -1 and project_status[i].value.find("-") != -1))):
 		project_status[i].fill = redFill
 		project_end_date[i].fill = redFill
 
 
-	#R10C1
+	#R11C1
 	if (last_updated[i].value == None and project_status[i].value != "Booked"):
 		last_updated[i].fill = redFill
 		project_status[i].fill = "Booked"
 
-	# R10C2
+	# R11C2
 	if (last_updated[i].value != None) and (last_updated[i].value < datetime.now().date() - timedelta(days=14)):
 		last_updated[i].fill = redFill
 
+	# R11C3
 	if (last_updated[i].value != None) and (last_updated[i].value > datetime.now().date()):
 		last_updated[i].value = redFill
 
-	# R7 case 1
+	# R12
+	if(rag_status[i].value == None):
+		rag_status[i].fill = redFill
+
+
+	#R13
+	## RAG REASON 404
+
+	#R14
+	if (margin_variance[i].value > -0.05):
+		margin_variance[i].fill = redFill
+
+	#R15
+	if (delivery_days_variance[i].value > -0.1):
+		delivery_days_variance[i].fill = redFill
+
+	#R16
+	if (reason_overrun[i].value == None):
+		reason_overrun[i].fill = redFill
+
+	#R23
+	if (delivery_country[i].value == None):
+		delivery_country[i].fill = redFill
+
+	#R24
+	if (project_type[i].value == None):
+		project_type[i].fill = redFill
+
+	# # R25
+	# if (to_expiry_date[i].value == None):
+	# 	to_expiry_date[i].fill = redFill
+
+	# R26
+	if (project_category[i].value == None):
+		project_category[i].fill = redFill
+
+	# R27C1
+	if (project_revenue[i].value == None):
+		project_revenue[i].fill = redFill
+
+	# R27 C2
+	if (project_revenue[i].value != None and (revenue_source[i].value.find("PO") != -1 )):
+		project_revenue[i].fill = redFill
+		# revenue_source[i].fill = redFill
+
+	# R27C3
+	if (project_revenue[i].value != 0 and (revenue_source[i].value == None or revenue_source[i].value == "CSAT" or revenue_source[i].value == "FOC" or revenue_source[i].value == "Reclass")):
+		project_revenue[i].fill = redFill
+
+
+	# R28
+	if (amount_invoiced[i].value != None and project_revenue[i].value != None) and (amount_invoiced[i].value > project_revenue[i].value):
+		amount_invoiced[i] .fill = redFill
+
+	# R8 case 1
 	if project_per_complete[i].value > 1:
 		project_per_complete[i].fill = redFill
-	else: #R7C3
+	else: #R8C3
 		if (project_status[i].value == "Complete" or 
 		   (project_status[i].value.find("Complete") != -1 and project_status[i].value.find("-") != -1) or (project_status[i].value == "Closed")):
 			project_status[i].fill = redFill
 			project_per_complete[i].fill = redFill
 			
-	#Req R6 case 1 & R7C2:
+	#Req R7 case 1 & R8C2:
 	if project_per_complete[i].value != None and ((int(project_per_complete[i].value) >= 1) and (project_status[i].value != "Complete" 
 		or project_status[i].value !="Closed")):
 		project_status[i].fill = redFill
 		project_per_complete[i].fill = redFill
 		continue
 
-	#Req R6 case 2:
+	#Req R7 case 2:
 	if (project_status[i].value.find("In Progress") !=-1 or project_stage[i].value.find("On Hold") !=-1 or project_status[i].value.find("Complete") !=1) and (project_status[i].value.find("-") !=-1):
 		if project_stage[i].value != "Opportunity":
 			project_stage[i].fill = redFill
 			project_status[i].fill = redFill
 		continue #No more rules for WAR
 
-	# R6 case 3:
+	# R7 case 3:
 	if (project_status[i].value == "In Progress" or project_status[i].value == "Booked" 
 		or project_status[i].value == "On Hold" or project_status[i].value == "Complete") and project_stage[i].value != "Awarded":
 		project_stage[i].fill = redFill
 		project_status[i].fill = redFill
-
 
 
 # for i in range(1,len(project_status)):
