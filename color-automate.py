@@ -24,6 +24,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Color, PatternFill, Font, Border
 from openpyxl.styles import colors
 from openpyxl.cell import Cell
+from datetime import datetime
 
 wb = openpyxl.load_workbook(filename='consolidated_report.xlsx')
 # ws = wb.get_worksheet_by_name('Consolidated_Report__crosstab')
@@ -65,30 +66,62 @@ wineFill =  PatternFill(start_color='722f37',
 project_status = ws['E']
 project_stage = ws['D']
 project_per_complete = ws['L']
-
+project_start_date =ws['H']
+project_end_date = ws['I']
+last_updated  = ws['k']
 
 for i in range (1,len(project_status)):
 	print project_per_complete[i].value > 1
 	print type(project_per_complete[i].value)
 
+	# R8C1
+	if project_start_date[i].value == None and project_status[i].value != "Booked":
+		project_start_date[i].fill = redFill
+		project_status[i].fill = redFill
+
+	# R9C1
+	if project_end_date[i].value == None and project_status[i].value != "Booked":
+		project_end_date[i].fill = redFill
+		project_status[i].fill = redFill
+
+	# R9C4
+	if project_end_date[i].value < project_start_date[i].value:
+		project_end_date[i].fill = redFill
+		project_start_date[i].fill = redFill
+
+	# R9C2
+	if (project_end_date[i].value < datetime.now().date() and (project_status[i].value != "Complete" or (project_status[i].value.find("Complete") != -1 and project_status[i].value.find("-") != -1) or project_status[i].value != "Closed")):
+		project_end_date[i].fill = redFill
+		project_status[i].fill = redFill
+
+	# R9C3
+	if (project_end_date[i].value > datetime.now().date() and (project_status[i].value == "Complete" or project_status[i].value == "Closed" or (project_status[i].value.find("Complete") != -1 and project_status[i].value.find("-") != -1))):
+		project_status[i].fill = redFill
+		project_end_date[i].fill = redFill
+
+
+	#R10C1
+
+
+
 	# R7 case 1
 	if project_per_complete[i].value > 1:
 		project_per_complete[i].fill = redFill
 	else: #R7C3
-		if project_status[i].value == "Complete" or (project_status[i].value.find("Complete") != -1 and project_status[i].value.find("-") != -1) 
-		or (project_status[i].value == "Closed"):
+		if (project_status[i].value == "Complete" or 
+		   (project_status[i].value.find("Complete") != -1 and project_status[i].value.find("-") != -1) or (project_status[i].value == "Closed")):
 			project_status[i].fill = redFill
 			project_per_complete[i].fill = redFill
 			
 	#Req R6 case 1 & R7C2:
-	if project_per_complete[i].value != None or ((int(project_per_complete[i].value) >= 1) and (project_status[i].value != "Complete" 
+	if project_per_complete[i].value != None and ((int(project_per_complete[i].value) >= 1) and (project_status[i].value != "Complete" 
 		or project_status[i].value !="Closed")):
 		project_status[i].fill = redFill
 		project_per_complete[i].fill = redFill
 		continue
 
 	#Req R6 case 2:
-	if (project_status[i].value.find("In Progress") !=-1 or project_stage[i].value.find("On Hold") !=-1 or project_status[i].value.find("Complete") !=1) and (project_status[i].find("-") !=-1):
+	if (project_status[i].value.find("In Progress") !=-1 or project_stage[i].value.find("On Hold") !=-1 or project_status[i].value.find("Complete") !=1) and (project_status[i].value.find("-") !=-1):
 		if project_stage[i].value != "Opportunity":
 			project_stage[i].fill = redFill
 			project_status[i].fill = redFill
@@ -96,9 +129,15 @@ for i in range (1,len(project_status)):
 
 	# R6 case 3:
 	if (project_status[i].value == "In Progress" or project_status[i].value == "Booked" 
-		or project_status[i].value == "On Hold" or project_status[i].value == "Complete") and project_stage[i].value != "Awarded"):
+		or project_status[i].value == "On Hold" or project_status[i].value == "Complete") and project_stage[i].value != "Awarded":
 		project_stage[i].fill = redFill
 		project_status[i].fill = redFill
+
+
+
+# for i in range(1,len(project_status)):
+	
+
 
 
 
