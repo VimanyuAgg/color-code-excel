@@ -63,25 +63,66 @@ wineFill =  PatternFill(start_color='722f37',
                    fill_type='solid')
 
 project_status = ws['E']
+project_stage = ws['D']
+project_per_complete = ws['L']
+
+
+for i in range (1,len(project_status)):
+	print project_per_complete[i].value > 1
+	print type(project_per_complete[i].value)
+
+	# R7 case 1
+	if project_per_complete[i].value > 1:
+		project_per_complete[i].fill = redFill
+	else: #R7C3
+		if project_status[i].value == "Complete" or (project_status[i].value.find("Complete") != -1 and project_status[i].value.find("-") != -1) 
+		or (project_status[i].value == "Closed"):
+			project_status[i].fill = redFill
+			project_per_complete[i].fill = redFill
+			
+	#Req R6 case 1 & R7C2:
+	if project_per_complete[i].value != None or ((int(project_per_complete[i].value) >= 1) and (project_status[i].value != "Complete" 
+		or project_status[i].value !="Closed")):
+		project_status[i].fill = redFill
+		project_per_complete[i].fill = redFill
+		continue
+
+	#Req R6 case 2:
+	if (project_status[i].value.find("In Progress") !=-1 or project_stage[i].value.find("On Hold") !=-1 or project_status[i].value.find("Complete") !=1) and (project_status[i].find("-") !=-1):
+		if project_stage[i].value != "Opportunity":
+			project_stage[i].fill = redFill
+			project_status[i].fill = redFill
+		continue #No more rules for WAR
+
+	# R6 case 3:
+	if (project_status[i].value == "In Progress" or project_status[i].value == "Booked" 
+		or project_status[i].value == "On Hold" or project_status[i].value == "Complete") and project_stage[i].value != "Awarded"):
+		project_stage[i].fill = redFill
+		project_status[i].fill = redFill
 
 
 
-for c in project_status:
-	#print type(c.value)
-	if c.value == "On Hold":
-		c.fill = redFill
-	elif c.value == "In Progress":
-		c.fill = amberFill
-	elif c.value =="Complete":
-		c.fill = greenFill
-	elif c.value == "Booked":
-		c.fill = blueFill
 
 
-for col in ws.iter_rows(min_row=1, max_col=ws.max_column, max_row=ws.max_row):
-	for cell in col:
-		if cell.value == None:
-			cell.fill = wineFill
+
+
+
+# for c in project_status:
+# 	#print type(c.value)
+# 	if c.value == "On Hold":
+# 		c.fill = redFill
+# 	elif c.value == "In Progress":
+# 		c.fill = amberFill
+# 	elif c.value =="Complete":
+# 		c.fill = greenFill
+# 	elif c.value == "Booked":
+# 		c.fill = blueFill
+
+
+# for col in ws.iter_rows(min_row=1, max_col=ws.max_column, max_row=ws.max_row):
+# 	for cell in col:
+# 		if cell.value == None:
+# 			cell.fill = wineFill
 
 
 wb.save('updated.xlsx')
