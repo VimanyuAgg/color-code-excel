@@ -24,7 +24,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Color, PatternFill, Font, Border
 from openpyxl.styles import colors
 from openpyxl.cell import Cell
-from datetime import datetime
+from datetime import datetime, timedelta
 
 wb = openpyxl.load_workbook(filename='consolidated_report.xlsx')
 # ws = wb.get_worksheet_by_name('Consolidated_Report__crosstab')
@@ -106,9 +106,12 @@ for i in range (1,len(project_status)):
 		last_updated[i].fill = redFill
 		project_status[i].fill = "Booked"
 
-	
+	# R10C2
+	if (last_updated[i].value != None) and (last_updated[i].value < datetime.now().date() - timedelta(days=14)):
+		last_updated[i].fill = redFill
 
-
+	if (last_updated[i].value != None) and (last_updated[i].value > datetime.now().date()):
+		last_updated[i].value = redFill
 
 	# R7 case 1
 	if project_per_complete[i].value > 1:
